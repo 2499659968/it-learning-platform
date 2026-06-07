@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   // 生产环境优化
   reactStrictMode: true, // 启用严格模式，帮助发现潜在问题
 
+  // Docker 部署配置
+  output: 'standalone', // 生成独立的 Docker 镜像
+
   // 图片优化配置
   images: {
     remotePatterns: [
@@ -22,9 +25,6 @@ const nextConfig: NextConfig = {
 
   // 生产环境压缩
   compress: true,
-
-  // 输出配置（如果需要导出静态站点）
-  // output: 'export', // 取消注释以启用静态导出
 
   // 重定向配置示例
   async redirects() {
@@ -62,4 +62,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-

@@ -1,0 +1,35 @@
+# Docker 相关文件
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# 日志文件
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 依赖目录
+node_modules/
+
+# Next.js 构建输出
+.next/
+out/
+
+# 环境变量
+.env*.local
+
+# 开发相关
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# 测试
+coverage/
+
+# 其他
+README.md
+.DS_Store

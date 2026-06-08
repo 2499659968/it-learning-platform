@@ -294,31 +294,36 @@ export default function SkillTreePage() {
             </div>
           </div>
 
-          {/* 第二行：路径选择器 + 操作按钮 */}
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            {/* 路径选择器 */}
-            <div className="flex gap-2 flex-wrap flex-1">
+          {/* 第二行：Tab 选项卡 + 操作按钮 */}
+          <div className="flex items-center justify-between">
+            {/* Tab 栏 */}
+            <div className="flex items-center gap-0 flex-1 overflow-x-auto scrollbar-hide">
               {learningPaths.map((path) => (
                 <button
                   key={path.id}
                   onClick={() => setSelectedPath(path.id)}
-                  className={`group px-3 py-2 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
+                  className={`group relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     selectedPath === path.id
-                      ? "bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30 scale-105"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105"
+                      ? "text-transparent bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text translate-y-[-2px] shadow-md"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:translate-y-[-1px]"
                   }`}
                 >
-                  <span className="text-sm mr-1.5">{path.icon}</span>
+                  <span className="text-base">{path.icon}</span>
                   <span>{path.name}</span>
-                  {selectedPath === path.id && (
-                    <span className="ml-1.5 inline-block w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
-                  )}
+                  {/* 底部高亮条 */}
+                  <span
+                    className={`absolute bottom-0 left-2 right-2 h-0.5 rounded-full transition-all duration-300 ${
+                      selectedPath === path.id
+                        ? "bg-gradient-to-r from-blue-600 to-cyan-600"
+                        : "bg-transparent group-hover:bg-gray-300 dark:group-hover:bg-gray-600"
+                    }`}
+                  ></span>
                 </button>
               ))}
             </div>
 
             {/* 操作按钮组 */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-shrink-0 ml-6 pl-6 border-l border-gray-200 dark:border-gray-700">
               {/* 重置按钮 */}
               <button
                 onClick={handleReset}

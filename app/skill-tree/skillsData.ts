@@ -554,20 +554,6 @@ export const skillsData: SkillNode[] = [
 
   // 工具链
   {
-    id: "git",
-    name: "Git",
-    description: "版本控制系统",
-    category: "tool",
-    difficulty: "beginner",
-    estimatedHours: 15,
-    prerequisites: ["web-basics"],
-    resources: {
-      docs: "https://git-scm.com/doc",
-    },
-    icon: "🔀",
-    gradient: "from-orange-600 to-red-600",
-  },
-  {
     id: "github",
     name: "GitHub",
     description: "代码托管平台",
@@ -1699,7 +1685,7 @@ export const skillsData: SkillNode[] = [
 export const learningPaths = [
   {
     id: "frontend",
-    name: "前端开发工程师",
+    name: "前端开发",
     description: "成为专业的前端开发者",
     skills: [
       "web-basics",
@@ -1744,7 +1730,7 @@ export const learningPaths = [
   },
   {
     id: "fullstack",
-    name: "全栈开发工程师",
+    name: "全栈开发",
     description: "前后端通吃的全能开发者",
     skills: [
       // 第0层：起点
@@ -1822,7 +1808,7 @@ export const learningPaths = [
   },
   {
     id: "vue-developer",
-    name: "Vue开发工程师",
+    name: "Vue开发",
     description: "Vue生态专家",
     skills: [
       "web-basics",
@@ -1840,7 +1826,7 @@ export const learningPaths = [
   },
   {
     id: "backend",
-    name: "后端开发工程师",
+    name: "后端开发",
     description: "专注服务端开发",
     skills: [
       "web-basics",
@@ -1875,7 +1861,7 @@ export const learningPaths = [
   },
   {
     id: "python-backend",
-    name: "Python后端工程师",
+    name: "Python后端",
     description: "Python Web开发专家",
     skills: [
       "web-basics",
@@ -1905,7 +1891,7 @@ export const learningPaths = [
   },
   {
     id: "go-backend",
-    name: "Go后端工程师",
+    name: "Go后端",
     description: "高性能Go服务开发",
     skills: [
       "web-basics",
@@ -1938,7 +1924,7 @@ export const learningPaths = [
   },
   {
     id: "java-backend",
-    name: "Java后端工程师",
+    name: "Java后端",
     description: "企业级Java开发专家",
     skills: [
       "web-basics",
@@ -1971,7 +1957,7 @@ export const learningPaths = [
   },
   {
     id: "devops",
-    name: "DevOps工程师",
+    name: "DevOps",
     description: "部署和运维专家",
     skills: [
       "web-basics",
@@ -1986,7 +1972,7 @@ export const learningPaths = [
   },
   {
     id: "ai-developer",
-    name: "AI应用开发者",
+    name: "AI开发",
     description: "构建AI驱动的应用",
     skills: [
       "web-basics",
@@ -2015,7 +2001,7 @@ export const learningPaths = [
   },
   {
     id: "devops-engineer",
-    name: "运维工程师",
+    name: "运维",
     description: "系统运维与基础设施管理",
     skills: [
       "web-basics",
@@ -2042,7 +2028,7 @@ export const learningPaths = [
   },
   {
     id: "database-engineer",
-    name: "数据库工程师",
+    name: "数据库",
     description: "数据库设计、优化与管理",
     skills: [
       "web-basics",

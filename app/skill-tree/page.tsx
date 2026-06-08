@@ -421,9 +421,9 @@ export default function SkillTreePage() {
                               {/* 主节点 */}
                               <div className={`relative w-full h-full rounded-full border-4 flex flex-col items-center justify-center transition-all ${
                                 status === "completed"
-                                  ? `bg-gradient-to-br ${skill.gradient} border-green-400 shadow-lg shadow-green-500/50`
+                                  ? "bg-gradient-to-br from-green-500 to-emerald-500 border-green-300 shadow-lg shadow-green-500/50"
                                   : status === "learning"
-                                  ? "bg-gradient-to-br from-yellow-600 to-orange-600 border-yellow-400 shadow-lg shadow-yellow-500/50 animate-pulse"
+                                  ? "bg-gradient-to-br from-yellow-500 to-orange-500 border-yellow-300 shadow-lg shadow-yellow-500/50 animate-pulse"
                                   : status === "available"
                                   ? "bg-gradient-to-br from-blue-600 to-cyan-600 border-blue-400 shadow-lg shadow-blue-500/50"
                                   : "bg-gray-800 border-gray-600 opacity-50"
@@ -528,28 +528,61 @@ export default function SkillTreePage() {
 
                             {/* 子技能展示区域 */}
                             {isExpanded && directChildren.length > 0 && (
-                              <div className="mt-4 flex flex-col gap-2 animate-in slide-in-from-top-2 duration-300">
+                              <div className="mt-6 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-300">
                                 {directChildren.map((child) => {
                                   const childStatus = getSkillStatus(child.id);
                                   return (
                                     <div
                                       key={child.id}
                                       onClick={() => toggleSkillStatus(child.id)}
-                                      className={`w-28 px-3 py-2 rounded-xl cursor-pointer transition-all hover:scale-105 border-2 ${
+                                      className={`w-56 px-4 py-3 rounded-2xl cursor-pointer transition-all hover:scale-105 hover:shadow-xl border-3 shadow-md ${
                                         childStatus === "completed"
-                                          ? "bg-green-500/20 border-green-400 text-green-300"
+                                          ? "bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40 border-green-400 dark:border-green-500"
                                           : childStatus === "learning"
-                                          ? "bg-yellow-500/20 border-yellow-400 text-yellow-300"
+                                          ? "bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/40 dark:to-orange-900/40 border-yellow-400 dark:border-yellow-500"
                                           : childStatus === "available"
-                                          ? "bg-blue-500/20 border-blue-400 text-blue-300"
-                                          : "bg-gray-700/50 border-gray-600 text-gray-400 opacity-50 cursor-not-allowed"
+                                          ? "bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/40 dark:to-cyan-900/40 border-blue-400 dark:border-blue-500"
+                                          : "bg-gray-200/60 dark:bg-gray-700/50 border-gray-400 dark:border-gray-600 opacity-60 cursor-not-allowed"
                                       }`}
                                     >
-                                      <div className="flex items-center gap-1.5 mb-1">
-                                        <span className="text-sm">{child.icon}</span>
-                                        <span className="text-xs font-bold">{child.name}</span>
+                                      <div className="flex items-start gap-2 mb-2">
+                                        <span className="text-2xl">{child.icon}</span>
+                                        <div className="flex-1">
+                                          <div className={`text-sm font-bold mb-1 ${
+                                            childStatus === "completed"
+                                              ? "text-green-700 dark:text-green-300"
+                                              : childStatus === "learning"
+                                              ? "text-yellow-700 dark:text-yellow-300"
+                                              : childStatus === "available"
+                                              ? "text-blue-700 dark:text-blue-300"
+                                              : "text-gray-600 dark:text-gray-400"
+                                          }`}>
+                                            {child.name}
+                                          </div>
+                                          <div className={`text-xs leading-relaxed ${
+                                            childStatus === "completed"
+                                              ? "text-green-600 dark:text-green-400"
+                                              : childStatus === "learning"
+                                              ? "text-yellow-600 dark:text-yellow-400"
+                                              : childStatus === "available"
+                                              ? "text-blue-600 dark:text-blue-400"
+                                              : "text-gray-500 dark:text-gray-500"
+                                          }`}>
+                                            {child.description}
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div className="text-[10px] opacity-80">{child.estimatedHours}h</div>
+                                      <div className={`text-xs font-medium ${
+                                        childStatus === "completed"
+                                          ? "text-green-600 dark:text-green-400"
+                                          : childStatus === "learning"
+                                          ? "text-yellow-600 dark:text-yellow-400"
+                                          : childStatus === "available"
+                                          ? "text-blue-600 dark:text-blue-400"
+                                          : "text-gray-500 dark:text-gray-500"
+                                      }`}>
+                                        {child.estimatedHours}h
+                                      </div>
                                     </div>
                                   );
                                 })}

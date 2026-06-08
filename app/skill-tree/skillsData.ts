@@ -19,7 +19,7 @@ export interface SkillNode {
 
 // 技能树数据
 export const skillsData: SkillNode[] = [
-  // 第一层：基础
+  // 第零层：起点
   {
     id: "web-basics",
     name: "Web基础",
@@ -33,7 +33,7 @@ export const skillsData: SkillNode[] = [
     gradient: "from-gray-500 to-gray-600",
   },
 
-  // 第二层：核心语言
+  // 第一层：基础标记
   {
     id: "html",
     name: "HTML",
@@ -63,6 +63,22 @@ export const skillsData: SkillNode[] = [
     gradient: "from-blue-500 to-cyan-500",
   },
   {
+    id: "git",
+    name: "Git",
+    description: "版本控制系统",
+    category: "tool",
+    difficulty: "beginner",
+    estimatedHours: 15,
+    prerequisites: ["web-basics"],
+    resources: {
+      docs: "https://git-scm.com/doc",
+    },
+    icon: "🔀",
+    gradient: "from-orange-600 to-red-600",
+  },
+
+  // 第二层：核心语言
+  {
     id: "javascript",
     name: "JavaScript",
     description: "网页动态交互",
@@ -85,7 +101,7 @@ export const skillsData: SkillNode[] = [
     category: "tool",
     difficulty: "beginner",
     estimatedHours: 10,
-    prerequisites: ["css"],
+    prerequisites: ["css", "web-basics"],
     resources: {
       docs: "https://sass-lang.com/",
     },
@@ -99,7 +115,7 @@ export const skillsData: SkillNode[] = [
     category: "tool",
     difficulty: "beginner",
     estimatedHours: 15,
-    prerequisites: ["css"],
+    prerequisites: ["css", "web-basics"],
     resources: {
       docs: "https://tailwindcss.com/",
     },

@@ -55,7 +55,7 @@ export const skillsData: SkillNode[] = [
     category: "language",
     difficulty: "beginner",
     estimatedHours: 30,
-    prerequisites: ["html"],
+    prerequisites: ["web-basics"],
     resources: {
       docs: "https://developer.mozilla.org/zh-CN/docs/Web/CSS",
     },
@@ -69,7 +69,7 @@ export const skillsData: SkillNode[] = [
     category: "language",
     difficulty: "intermediate",
     estimatedHours: 80,
-    prerequisites: ["html", "css"],
+    prerequisites: ["html"],
     resources: {
       docs: "https://developer.mozilla.org/zh-CN/docs/Web/JavaScript",
     },

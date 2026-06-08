@@ -531,58 +531,139 @@ export default function SkillTreePage() {
                               <div className="mt-6 flex flex-col gap-3 animate-in slide-in-from-top-2 duration-300">
                                 {directChildren.map((child) => {
                                   const childStatus = getSkillStatus(child.id);
+                                  const isChildHovered = hoveredSkill === child.id;
                                   return (
                                     <div
                                       key={child.id}
-                                      onClick={() => toggleSkillStatus(child.id)}
-                                      className={`w-56 px-4 py-3 rounded-2xl cursor-pointer transition-all hover:scale-105 hover:shadow-xl border-3 shadow-md ${
-                                        childStatus === "completed"
-                                          ? "bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40 border-green-400 dark:border-green-500"
-                                          : childStatus === "learning"
-                                          ? "bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/40 dark:to-orange-900/40 border-yellow-400 dark:border-yellow-500"
-                                          : childStatus === "available"
-                                          ? "bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/40 dark:to-cyan-900/40 border-blue-400 dark:border-blue-500"
-                                          : "bg-gray-200/60 dark:bg-gray-700/50 border-gray-400 dark:border-gray-600 opacity-60 cursor-not-allowed"
-                                      }`}
+                                      className="relative"
+                                      onMouseEnter={() => setHoveredSkill(child.id)}
+                                      onMouseLeave={() => setHoveredSkill(null)}
                                     >
-                                      <div className="flex items-start gap-2 mb-2">
-                                        <span className="text-2xl">{child.icon}</span>
-                                        <div className="flex-1">
-                                          <div className={`text-sm font-bold mb-1 ${
-                                            childStatus === "completed"
-                                              ? "text-green-700 dark:text-green-300"
-                                              : childStatus === "learning"
-                                              ? "text-yellow-700 dark:text-yellow-300"
-                                              : childStatus === "available"
-                                              ? "text-blue-700 dark:text-blue-300"
-                                              : "text-gray-600 dark:text-gray-400"
-                                          }`}>
-                                            {child.name}
-                                          </div>
-                                          <div className={`text-xs leading-relaxed ${
-                                            childStatus === "completed"
-                                              ? "text-green-600 dark:text-green-400"
-                                              : childStatus === "learning"
-                                              ? "text-yellow-600 dark:text-yellow-400"
-                                              : childStatus === "available"
-                                              ? "text-blue-600 dark:text-blue-400"
-                                              : "text-gray-500 dark:text-gray-500"
-                                          }`}>
-                                            {child.description}
+                                      <div
+                                        onClick={() => toggleSkillStatus(child.id)}
+                                        className={`w-56 px-4 py-3 rounded-2xl cursor-pointer transition-all hover:scale-105 hover:shadow-xl border-3 shadow-md ${
+                                          childStatus === "completed"
+                                            ? "bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/40 dark:to-emerald-900/40 border-green-400 dark:border-green-500"
+                                            : childStatus === "learning"
+                                            ? "bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/40 dark:to-orange-900/40 border-yellow-400 dark:border-yellow-500"
+                                            : childStatus === "available"
+                                            ? "bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/40 dark:to-cyan-900/40 border-blue-400 dark:border-blue-500"
+                                            : "bg-gray-200/60 dark:bg-gray-700/50 border-gray-400 dark:border-gray-600 opacity-60 cursor-not-allowed"
+                                        }`}
+                                      >
+                                        <div className="flex items-start gap-2 mb-2">
+                                          <span className="text-2xl">{child.icon}</span>
+                                          <div className="flex-1">
+                                            <div className={`text-sm font-bold mb-1 ${
+                                              childStatus === "completed"
+                                                ? "text-green-700 dark:text-green-300"
+                                                : childStatus === "learning"
+                                                ? "text-yellow-700 dark:text-yellow-300"
+                                                : childStatus === "available"
+                                                ? "text-blue-700 dark:text-blue-300"
+                                                : "text-gray-600 dark:text-gray-400"
+                                            }`}>
+                                              {child.name}
+                                            </div>
+                                            <div className={`text-xs leading-relaxed ${
+                                              childStatus === "completed"
+                                                ? "text-green-600 dark:text-green-400"
+                                                : childStatus === "learning"
+                                                ? "text-yellow-600 dark:text-yellow-400"
+                                                : childStatus === "available"
+                                                ? "text-blue-600 dark:text-blue-400"
+                                                : "text-gray-500 dark:text-gray-500"
+                                            }`}>
+                                              {child.description}
+                                            </div>
                                           </div>
                                         </div>
+                                        <div className={`text-xs font-medium ${
+                                          childStatus === "completed"
+                                            ? "text-green-600 dark:text-green-400"
+                                            : childStatus === "learning"
+                                            ? "text-yellow-600 dark:text-yellow-400"
+                                            : childStatus === "available"
+                                            ? "text-blue-600 dark:text-blue-400"
+                                            : "text-gray-500 dark:text-gray-500"
+                                        }`}>
+                                          {child.estimatedHours}h
+                                        </div>
                                       </div>
-                                      <div className={`text-xs font-medium ${
-                                        childStatus === "completed"
-                                          ? "text-green-600 dark:text-green-400"
-                                          : childStatus === "learning"
-                                          ? "text-yellow-600 dark:text-yellow-400"
-                                          : childStatus === "available"
-                                          ? "text-blue-600 dark:text-blue-400"
-                                          : "text-gray-500 dark:text-gray-500"
-                                      }`}>
-                                        {child.estimatedHours}h
-                                      </div>
+
+                                      {/* 子技能悬浮详情卡片 */}
+                                      {isChildHovered && (
+                                        <div className="absolute left-full ml-4 top-0 w-80 bg-white/95 dark:bg-black/95 backdrop-blur-sm border border-gray-200 dark:border-white/20 rounded-2xl p-5 shadow-2xl z-50">
+                                          <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                                            <span className="text-3xl">{child.icon}</span>
+                                            <div>
+                                              <h3 className="text-gray-900 dark:text-white font-bold text-lg">{child.name}</h3>
+                                              <p className="text-gray-600 dark:text-gray-400 text-xs">{skill.name} 子技能</p>
+                                            </div>
+                                          </div>
+
+                                          <div className="space-y-3 text-sm">
+                                            <div>
+                                              <div className="text-gray-500 dark:text-gray-400 text-xs font-semibold mb-1">📝 技能描述</div>
+                                              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{child.description}</p>
+                                            </div>
+
+                                            <div>
+                                              <div className="text-gray-500 dark:text-gray-400 text-xs font-semibold mb-1">⏱️ 学习时长</div>
+                                              <p className="text-gray-700 dark:text-gray-300">预计 <span className="font-bold text-purple-600 dark:text-purple-400">{child.estimatedHours}</span> 小时</p>
+                                            </div>
+
+                                            <div>
+                                              <div className="text-gray-500 dark:text-gray-400 text-xs font-semibold mb-1">📚 难度等级</div>
+                                              <span className={`inline-block px-2 py-1 rounded-lg text-xs font-medium ${
+                                                child.difficulty === "beginner" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" :
+                                                child.difficulty === "intermediate" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300" :
+                                                "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                                              }`}>
+                                                {child.difficulty === "beginner" ? "入门" : child.difficulty === "intermediate" ? "中级" : "高级"}
+                                              </span>
+                                            </div>
+
+                                            {child.resources?.docs && (
+                                              <div>
+                                                <div className="text-gray-500 dark:text-gray-400 text-xs font-semibold mb-1">🔗 学习资源</div>
+                                                <a
+                                                  href={child.resources.docs}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
+                                                  onClick={(e) => e.stopPropagation()}
+                                                >
+                                                  查看官方文档 →
+                                                </a>
+                                              </div>
+                                            )}
+
+                                            <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                                              {childStatus === "locked" && (
+                                                <div className="text-red-600 dark:text-red-400 text-xs flex items-center gap-1">
+                                                  🔒 需要先完成 {skill.name}
+                                                </div>
+                                              )}
+                                              {childStatus === "available" && (
+                                                <div className="text-blue-600 dark:text-blue-400 text-xs flex items-center gap-1">
+                                                  📚 点击卡片开始学习
+                                                </div>
+                                              )}
+                                              {childStatus === "learning" && (
+                                                <div className="text-yellow-600 dark:text-yellow-400 text-xs flex items-center gap-1">
+                                                  📖 学习中，点击标记为完成
+                                                </div>
+                                              )}
+                                              {childStatus === "completed" && (
+                                                <div className="text-green-600 dark:text-green-400 text-xs flex items-center gap-1">
+                                                  ✅ 已完成！点击可撤销
+                                                </div>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
                                     </div>
                                   );
                                 })}

@@ -5,6 +5,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { skillsData, learningPaths } from "./skillsData";
 import { getCurrentUser, logout, updateUserProgress, getUserProgress } from "@/lib/auth";
+import SkillStatsPanel from "@/components/SkillStatsPanel";
+import {
+  ArrowLeft,
+  TreeDeciduous,
+  CheckCircle2,
+  BookOpen,
+  Clock,
+  User,
+  LogOut,
+  LogIn,
+  RefreshCcw,
+  BarChart3,
+  X
+} from "lucide-react";
 
 export default function SkillTreePage() {
   const router = useRouter();
@@ -13,6 +27,8 @@ export default function SkillTreePage() {
   const [learningSkills, setLearningSkills] = useState<string[]>([]);
   const [selectedPath, setSelectedPath] = useState<string>("frontend");
   const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
+  const [showStats, setShowStats] = useState<boolean>(false);
+  const [expandedSkills, setExpandedSkills] = useState<Set<string>>(new Set()); // 展开的技能
 
   // 加载用户和进度
   useEffect(() => {
@@ -38,6 +54,17 @@ export default function SkillTreePage() {
   const handleLogout = () => {
     logout();
     router.push("/login");
+  };
+
+  // 重置学习进度
+  const handleReset = () => {
+    if (confirm("确定要清除所有学习进度吗？此操作不可恢复！")) {
+      setCompletedSkills([]);
+      setLearningSkills([]);
+      if (user) {
+        updateUserProgress([], []);
+      }
+    }
   };
 
   // 计算节点状态
@@ -67,6 +94,25 @@ export default function SkillTreePage() {
     } else if (status === "available") {
       setLearningSkills([...learningSkills, skillId]);
     }
+  };
+
+  // 切换技能展开状态
+  const toggleSkillExpand = (skillId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // 阻止触发技能状态切换
+    setExpandedSkills(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(skillId)) {
+        newSet.delete(skillId);
+      } else {
+        newSet.add(skillId);
+      }
+      return newSet;
+    });
+  };
+
+  // 获取技能的直接子技能
+  const getDirectChildren = (skillId: string) => {
+    return skillsData.filter((s) => s.parentId === skillId);
   };
 
   // 按层级分组技能 - 根据选择的路径过滤
@@ -105,6 +151,9 @@ export default function SkillTreePage() {
       filteredSkills = skillsData.filter((skill) => allRequiredSkills.has(skill.id));
     }
 
+    // 过滤掉子技能（parentId存在的技能不在主树显示）
+    filteredSkills = filteredSkills.filter((skill) => !skill.parentId);
+
     filteredSkills.forEach((skill) => {
       const level = skill.prerequisites.length;
       if (!levels[level]) levels[level] = [];
@@ -134,86 +183,156 @@ export default function SkillTreePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
-      {/* 顶部导航 */}
-      <header className="bg-black/50 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-[1600px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-950 dark:to-gray-900">
+      {/* 顶部导航 - 现代风格 */}
+      <header className="sticky top-0 z-50 bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border-b border-gray-200/50 dark:border-white/10 shadow-sm">
+        <div className="max-w-[1600px] mx-auto px-8 py-5">
+          {/* 第一行：标题、返回和用户信息 */}
+          <div className="flex items-center justify-between mb-6">
+            {/* 左侧：返回 + 标题 */}
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-gray-400 hover:text-white transition-colors text-sm"
+                className="group flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-all text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                ← 返回
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span>返回首页</span>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-white">技能树</h1>
-                <p className="text-sm text-gray-400">选择你的成长路径</p>
+
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-[16px] flex items-center justify-center shadow-lg">
+                  <TreeDeciduous className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">技能树</h1>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">探索你的成长路径</p>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-6">
-              {/* 统计信息 */}
-              <div className="flex gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-gray-300">已完成: <span className="text-white font-bold">{completedSkills.length}</span></span>
+            {/* 右侧：统计数据 + 用户 */}
+            <div className="flex items-center gap-4">
+              {/* 统计卡片 */}
+              <div className="flex gap-2">
+                <div className="px-4 py-2 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-500/20">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-3 h-3 text-green-500" />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">已完成</span>
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">{completedSkills.length}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full animate-pulse"></div>
-                  <span className="text-gray-300">学习中: <span className="text-white font-bold">{learningSkills.length}</span></span>
+
+                <div className="px-4 py-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-xl border border-yellow-200 dark:border-yellow-500/20">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-3 h-3 text-yellow-500" />
+                    <span className="text-xs text-gray-600 dark:text-gray-400">学习中</span>
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">{learningSkills.length}</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-300">⏱️ {totalHours}h</span>
+
+                <div className="px-4 py-2 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-200 dark:border-purple-500/20">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3 h-3 text-purple-500" />
+                    <span className="text-sm font-bold text-gray-900 dark:text-white">{totalHours}h</span>
+                  </div>
                 </div>
               </div>
 
               {/* 用户信息 */}
               {user ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-300">{user.username}</span>
+                <div className="flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user.username}</span>
                   <button
                     onClick={handleLogout}
-                    className="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded text-sm transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium transition-all"
                   >
-                    退出
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>退出</span>
                   </button>
                 </div>
               ) : (
                 <Link
                   href="/login"
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium text-sm transition-colors"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-br from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-medium text-sm transition-all shadow-lg shadow-blue-500/30"
                 >
-                  登录
+                  <LogIn className="w-4 h-4" />
+                  <span>登录</span>
                 </Link>
               )}
             </div>
           </div>
 
-          {/* 路径选择 */}
-          <div className="flex gap-3 mt-4">
-            {learningPaths.map((path) => (
+          {/* 第二行：路径选择器 + 操作按钮 */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            {/* 路径选择器 */}
+            <div className="flex gap-2 flex-wrap flex-1">
+              {learningPaths.map((path) => (
+                <button
+                  key={path.id}
+                  onClick={() => setSelectedPath(path.id)}
+                  className={`group px-3 py-2 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
+                    selectedPath === path.id
+                      ? "bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30 scale-105"
+                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105"
+                  }`}
+                >
+                  <span className="text-sm mr-1.5">{path.icon}</span>
+                  <span>{path.name}</span>
+                  {selectedPath === path.id && (
+                    <span className="ml-1.5 inline-block w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* 操作按钮组 */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* 重置按钮 */}
               <button
-                key={path.id}
-                onClick={() => setSelectedPath(path.id)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  selectedPath === path.id
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/50"
-                    : "bg-white/10 text-gray-300 hover:bg-white/20"
+                onClick={handleReset}
+                className="group px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 border border-transparent hover:border-red-200 dark:hover:border-red-500/30 whitespace-nowrap"
+                title="清除所有学习进度"
+              >
+                <RefreshCcw className="w-3.5 h-3.5" />
+                <span>重新学习</span>
+              </button>
+
+              {/* 统计面板切换按钮 */}
+              <button
+                onClick={() => setShowStats(!showStats)}
+                className={`group px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 shadow-lg whitespace-nowrap ${
+                  showStats
+                    ? "bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-purple-500/30"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
                 }`}
               >
-                {path.icon} {path.name}
+                {showStats ? <X className="w-3.5 h-3.5" /> : <BarChart3 className="w-3.5 h-3.5" />}
+                <span>{showStats ? "隐藏统计" : "查看统计"}</span>
               </button>
-            ))}
+            </div>
           </div>
         </div>
       </header>
 
       {/* 技能树主体 */}
-      <main className="max-w-[1600px] mx-auto px-6 py-12">
+      <main className="max-w-[1600px] mx-auto px-8 py-12">
+        {/* 统计面板 - 可折叠 */}
+        {showStats && (
+          <div className="mb-8 animate-in slide-in-from-top-4 duration-300">
+            <SkillStatsPanel
+              completedSkills={completedSkills}
+              learningSkills={learningSkills}
+              selectedPath={selectedPath}
+            />
+          </div>
+        )}
+
         <div className="relative">
-          {/* 游戏风格背景网格 */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
+          {/* 装饰性背景网格 */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
 
           {/* 技能树层级展示 */}
           <div className="relative space-y-16">
@@ -240,9 +359,11 @@ export default function SkillTreePage() {
                         const inPath = isInPath(skill.id);
                         const childSkills = getChildSkills(skill.id);
                         const isHovered = hoveredSkill === skill.id;
+                        const directChildren = getDirectChildren(skill.id);
+                        const isExpanded = expandedSkills.has(skill.id);
 
                         return (
-                          <div key={skill.id} className="relative group">
+                          <div key={skill.id} className="relative group flex flex-col items-center">
                             {/* 连接线到子节点 */}
                             {childSkills.length > 0 && (
                               <svg
@@ -312,6 +433,17 @@ export default function SkillTreePage() {
                                   <div className="absolute -top-2 -right-2 w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg animate-bounce">
                                     ⭐
                                   </div>
+                                )}
+
+                                {/* 展开按钮 */}
+                                {skill.isExpandable && directChildren.length > 0 && (
+                                  <button
+                                    onClick={(e) => toggleSkillExpand(skill.id, e)}
+                                    className="absolute -bottom-2 -right-2 w-7 h-7 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform z-20"
+                                    title={isExpanded ? "收起子技能" : "展开子技能"}
+                                  >
+                                    <span className={`text-sm transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>▼</span>
+                                  </button>
                                 )}
 
                                 {/* 状态图标 */}
@@ -393,6 +525,36 @@ export default function SkillTreePage() {
                                 </div>
                               )}
                             </div>
+
+                            {/* 子技能展示区域 */}
+                            {isExpanded && directChildren.length > 0 && (
+                              <div className="mt-4 flex flex-col gap-2 animate-in slide-in-from-top-2 duration-300">
+                                {directChildren.map((child) => {
+                                  const childStatus = getSkillStatus(child.id);
+                                  return (
+                                    <div
+                                      key={child.id}
+                                      onClick={() => toggleSkillStatus(child.id)}
+                                      className={`w-28 px-3 py-2 rounded-xl cursor-pointer transition-all hover:scale-105 border-2 ${
+                                        childStatus === "completed"
+                                          ? "bg-green-500/20 border-green-400 text-green-300"
+                                          : childStatus === "learning"
+                                          ? "bg-yellow-500/20 border-yellow-400 text-yellow-300"
+                                          : childStatus === "available"
+                                          ? "bg-blue-500/20 border-blue-400 text-blue-300"
+                                          : "bg-gray-700/50 border-gray-600 text-gray-400 opacity-50 cursor-not-allowed"
+                                      }`}
+                                    >
+                                      <div className="flex items-center gap-1.5 mb-1">
+                                        <span className="text-sm">{child.icon}</span>
+                                        <span className="text-xs font-bold">{child.name}</span>
+                                      </div>
+                                      <div className="text-[10px] opacity-80">{child.estimatedHours}h</div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
                         );
                       })}

@@ -341,7 +341,7 @@ export default function SkillTreePage() {
               .map((level) => {
                 const levelNum = Number(level);
                 const skills = leveledSkills[levelNum];
-                const levelNames = ["起点", "基础", "进阶", "高级", "专家", "大师"];
+                const levelNames = ["起点", "基础标记", "核心语言", "框架工具", "进阶技术", "专家级", "大师级"];
 
                 return (
                   <div key={level} className="relative">

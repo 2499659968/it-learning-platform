@@ -115,6 +115,34 @@ export default function SkillTreePage() {
     return skillsData.filter((s) => s.parentId === skillId);
   };
 
+  // 递归计算技能在依赖树中的实际深度
+  const getSkillDepth = (() => {
+    const depthCache = new Map<string, number>();
+
+    const computeDepth = (skillId: string, visited: Set<string> = new Set()): number => {
+      if (depthCache.has(skillId)) return depthCache.get(skillId)!;
+      if (visited.has(skillId)) return 0; // 防止循环引用
+
+      const skill = skillsData.find((s) => s.id === skillId);
+      if (!skill || skill.prerequisites.length === 0) {
+        depthCache.set(skillId, 0);
+        return 0;
+      }
+
+      visited.add(skillId);
+      let maxDepth = 0;
+      for (const prereqId of skill.prerequisites) {
+        const depth = computeDepth(prereqId, new Set(visited)) + 1;
+        maxDepth = Math.max(maxDepth, depth);
+      }
+
+      depthCache.set(skillId, maxDepth);
+      return maxDepth;
+    };
+
+    return computeDepth;
+  })();
+
   // 按层级分组技能 - 根据选择的路径过滤
   const groupSkillsByLevel = (pathId: string) => {
     const levels: Record<number, typeof skillsData> = {};
@@ -154,8 +182,9 @@ export default function SkillTreePage() {
     // 过滤掉子技能（parentId存在的技能不在主树显示）
     filteredSkills = filteredSkills.filter((skill) => !skill.parentId);
 
+    // 先计算出每个技能的深度，然后按深度分组
     filteredSkills.forEach((skill) => {
-      const level = skill.prerequisites.length;
+      const level = getSkillDepth(skill.id);
       if (!levels[level]) levels[level] = [];
       levels[level].push(skill);
     });
@@ -341,7 +370,7 @@ export default function SkillTreePage() {
               .map((level) => {
                 const levelNum = Number(level);
                 const skills = leveledSkills[levelNum];
-                const levelNames = ["起点", "基础标记", "核心语言", "框架工具", "进阶技术", "专家级", "大师级"];
+                const levelNames = ["🚀 起点", "📝 基础标记", "⚡ 核心语言", "🔧 框架工具", "📚 进阶技术", "🎯 专家级", "👑 大师级"];
 
                 return (
                   <div key={level} className="relative">
